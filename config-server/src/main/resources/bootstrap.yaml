@@ -1,5 +1,5 @@
 server:
-  port: 9000
+  port: ${CONFIG_SERV_PORT:9000}
 
 spring:
   application:
@@ -8,10 +8,10 @@ spring:
     config:
       server:
         git:
-          uri: https://github.com/RobinUnfv/session4.git
+          uri: ${CONFIG_SERV_URI:https://github.com/RobinUnfv/session4.git}
           clone-on-start: true
           refresh-rate: 10
-          default-label: develop
+          default-label: ${CONFIG_SERV_BRANCH:develop}
 
 eureka:
   client:

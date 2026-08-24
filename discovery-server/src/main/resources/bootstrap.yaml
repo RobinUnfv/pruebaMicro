@@ -1,12 +1,12 @@
 server:
-  port: 8761
+  port: ${DISC_SERV_PORT:8761}
 
 spring:
   application:
     name: discovery-server
   config:
     activate:
-      on-profile: server01
+      on-profile: ${DISC_SERV_PROFILE:server01}
 
 eureka:
   client:
