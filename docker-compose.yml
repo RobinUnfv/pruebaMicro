@@ -80,31 +80,31 @@ services:
       retries: 5
     restart: on-failure
 
-#  msvc-cliente:
-#    build:
-#      context: .
-#      dockerfile: ./msvc-cliente/Dockerfile
-#    container_name: msvc-cliente
-#    depends_on:
-#      discovery-server:
-#        condition: service_healthy
-#      config-server:
-#        condition: service_healthy
-#      postgres:
-#        condition: service_started
-#    ports:
-#      - "${MSVC_CLIENTE_PORT}:7010"
-#    environment:
-#      - PORT_SERVICE_CLIENTE=${MSVC_CLIENTE_PORT}
-#      - CONFIG_SERVER_BRANCH=${CONFI_SERVER_BRANCH}
-#      - EUREKA-SERVICE-URL=http://${DISCOVERY_SERVICE_HOST}:${DISCOVERY_SERVICE_PORT}/eureka
-#      - BD_POSTGRESQL_URL=jdbc:postgresql://postgresql:${MSVC_CLIENTE_BD_PORT}/${MSVC_CLIENTE_BD_NAME}
-#      - BD_POSTGRESQL_USERNAME=${POSTGRESQL_USER}
-#      - BD_POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD}
-#      - CONFIG_SERVER_CONF_URI=http://${CONFI_SERVER_HOST}:${CONFI_SERVER_PORT}
-#      - CONFIG_SERVER_PROFILE=${CONFI_SERVER_PROFILE}
-#    networks:
-#      - erp-vpc
+  msvc-cliente:
+    build:
+      context: .
+      dockerfile: ./msvc-cliente/Dockerfile
+    container_name: msvc-cliente
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      postgres:
+        condition: service_started
+    ports:
+      - "${MSVC_CLIENTE_PORT}:7010"
+    environment:
+      - CONFIG_SERVER_CONF_URI=http://${CONFI_SERVER_HOST}:${CONFI_SERVER_PORT}
+      - CONFIG_SERVER_PROFILE=${CONFI_SERVER_PROFILE}
+      - PORT_SERVICE_CLIENTE=${MSVC_CLIENTE_PORT}
+      - CONFIG_SERVER_BRANCH=${CONFI_SERVER_BRANCH}
+      - EUREKA-CLIENT-SERV-URL=http://${DISCOVERY_SERVICE_HOST}:${DISCOVERY_SERVICE_PORT}/eureka
+      - BD_POSTGRESQL_URL=jdbc:postgresql://postgres:${MSVC_CLIENTE_BD_PORT}/${MSVC_CLIENTE_BD_NAME}
+      - BD_POSTGRESQL_USERNAME=${POSTGRESQL_USER}
+      - BD_POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD}
+    networks:
+      - erp-vpc
 #
 #  msvc-compras:
 #    build:
