@@ -1,0 +1,45 @@
+services:
+  # PostgreSQL - (cliente)
+  postgres:
+    image: postgres:17
+    container_name: ${POSTGRESQL_NAME}
+    environment:
+      POSTGRES_DB: ${POSTGRESQL_DB}
+      POSTGRES_USER: ${POSTGRESQL_USER}
+      POSTGRES_PASSWORD: ${POSTGRESQL_PASSWORD}
+    ports:
+      - "${POSTGRESQL_PORT}:5432"
+    volumes:
+      - ./docker-files/db/postgresql:/docker-entrypoint-initdb.d
+    networks:
+      - erp-vpc
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRESQL_USER} -d ${POSTGRESQL_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # MongoDB - (Compras)
+  mongodb:
+    image: mongo:8
+    container_name: ${MONGODB_NAME}
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGODB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGODB_PASSWORD}
+      MONGO_INITDB_DATABASE: ${MONGODB_DB}
+    ports:
+      - "${MONGODB_PORT}:27017"
+    volumes:
+      - ./docker-files/db/mongodb:/docker-entrypoint-initdb.d
+    networks:
+      - erp-vpc
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')", "-u", "${MONGODB_USER}", "-p", "${MONGODB_PASSWORD}", "--authenticationDatabase", "admin", "--quiet"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+networks:
+  erp-vpc:
+    driver: bridge

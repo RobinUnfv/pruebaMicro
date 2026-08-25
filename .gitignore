@@ -1,0 +1,14 @@
+### INTELLIJ IDEA
+.idea
+*.iws
+*.iml
+*.ipr
+
+### VS Code
+.vscode/
+
+### Ignore log files
+*.log
+
+### Ignorar archivos sensibles
+*.env
