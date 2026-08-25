@@ -40,6 +40,119 @@ services:
       retries: 5
       start_period: 20s
 
+  discovery-server:
+    build:
+      context: .
+      dockerfile: ./discovery-server/Dockerfile
+    container_name: discovery-server
+    ports:
+      - "${DISCOVERY_SERVICE_PORT}:8761"
+    networks:
+      - erp-vpc
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://discovery-server:${DISCOVERY_SERVICE_PORT}/actuator/health"]
+      interval: 20s
+      timeout: 3s
+      retries: 5
+    restart: on-failure
+
+  config-server:
+    build:
+      context: .
+      dockerfile: ./config-server/Dockerfile
+    container_name: config-server
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+    ports:
+      - "${CONFI_SERVER_PORT}:9000"
+    environment:
+      - PORT_SERVICE_CONFIG=${CONFI_SERVER_PORT}
+      - CONFIG_SERVER_GIT_URI=${CONFI_SERVER_GIT_URI}
+      - CONFIG_SERVER_GIT_BRANCH=${CONFI_SERVER_GIT_BRANCH}
+      - EUREKA-CLIENT-SERV-URL=http://${DISCOVERY_SERVICE_HOST}:${DISCOVERY_SERVICE_PORT}/eureka
+    networks:
+      - erp-vpc
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://config-server:${CONFI_SERVER_PORT}/actuator/health" ]
+      interval: 20s
+      timeout: 3s
+      retries: 5
+    restart: on-failure
+
+#  msvc-cliente:
+#    build:
+#      context: .
+#      dockerfile: ./msvc-cliente/Dockerfile
+#    container_name: msvc-cliente
+#    depends_on:
+#      discovery-server:
+#        condition: service_healthy
+#      config-server:
+#        condition: service_healthy
+#      postgres:
+#        condition: service_started
+#    ports:
+#      - "${MSVC_CLIENTE_PORT}:7010"
+#    environment:
+#      - PORT_SERVICE_CLIENTE=${MSVC_CLIENTE_PORT}
+#      - CONFIG_SERVER_BRANCH=${CONFI_SERVER_BRANCH}
+#      - EUREKA-SERVICE-URL=http://${DISCOVERY_SERVICE_HOST}:${DISCOVERY_SERVICE_PORT}/eureka
+#      - BD_POSTGRESQL_URL=jdbc:postgresql://postgresql:${MSVC_CLIENTE_BD_PORT}/${MSVC_CLIENTE_BD_NAME}
+#      - BD_POSTGRESQL_USERNAME=${POSTGRESQL_USER}
+#      - BD_POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD}
+#      - CONFIG_SERVER_CONF_URI=http://${CONFI_SERVER_HOST}:${CONFI_SERVER_PORT}
+#      - CONFIG_SERVER_PROFILE=${CONFI_SERVER_PROFILE}
+#    networks:
+#      - erp-vpc
+#
+#  msvc-compras:
+#    build:
+#      context: .
+#      dockerfile: ./msvc-compras/Dockerfile
+#    container_name: msvc-compras
+#    depends_on:
+#      discovery-server:
+#        condition: service_healthy
+#      config-server:
+#        condition: service_healthy
+#      mongodb:
+#        condition: service_started
+#    ports:
+#      - "${MSVC_COMPRAS_PORT}:7020"
+#    environment:
+#      - PORT_SERVICE_COMPRAS=${MSVC_COMPRAS_PORT}
+#      - CONFIG_SERVER_BRANCH=${CONFI_SERVER_BRANCH}
+#      - EUREKA-SERVICE-URL=http://${DISCOVERY_SERVICE_HOST}:${DISCOVERY_SERVICE_PORT}/eureka
+#      - BD_MONGODB_URI=mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_HOST}:${MONGODB_PORT}/${MONGODB_DB}?authSource=admin
+#      - CONFIG_SERVER_CONF_URI=http://${CONFI_SERVER_HOST}:${CONFI_SERVER_PORT}
+#      - CONFIG_SERVER_PROFILE=${CONFI_SERVER_PROFILE}
+#    networks:
+#      - erp-vpc
+#
+#  cloud-gateway:
+#    build:
+#      context: .
+#      dockerfile: ./cloud-gateway/Dockerfile
+#    container_name: cloud-gateway
+#    depends_on:
+#      discovery-server:
+#        condition: service_healthy
+#      config-server:
+#        condition: service_healthy
+#      msvc-cliente:
+#        condition: service_started
+#      msvc-compras:
+#        condition: service_started
+#    ports:
+#      - "${CLOUD_GATEWAY_PORT}:4040"
+#    environment:
+#      - PORT_SERVICE_GATEWAY=${CLOUD_GATEWAY_PORT}
+#      - CONFIG_SERVER_CONF_URI=http://${CONFI_SERVER_HOST}:${CONFI_SERVER_PORT}
+#      - CONFIG_SERVER_PROFILE=${CONFI_SERVER_PROFILE}
+#    networks:
+#      - erp-vpc
+
 networks:
   erp-vpc:
     driver: bridge

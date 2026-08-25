@@ -3,6 +3,6 @@ spring:
     name: cloud-gateway
   cloud:
     config:
-      uri: http://localhost:9000
-      profile: dev
+      uri: ${CONFIG_SERVER_CONF_URI}
+      profile: ${CONFIG_SERVER_PROFILE}
       enabled: true
