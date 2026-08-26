@@ -17,4 +17,4 @@ eureka:
   instance:
     hostname: localhost
     prefer-ip-address: false
-    lease-expiration-duration-in-seconds: 30
+    lease-expiration-duration-in-seconds: 5

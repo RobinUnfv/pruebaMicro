@@ -98,37 +98,34 @@ services:
       - CONFIG_SERVER_CONF_URI=http://${CONFI_SERVER_HOST}:${CONFI_SERVER_PORT}
       - CONFIG_SERVER_PROFILE=${CONFI_SERVER_PROFILE}
       - PORT_SERVICE_CLIENTE=${MSVC_CLIENTE_PORT}
-      - CONFIG_SERVER_BRANCH=${CONFI_SERVER_BRANCH}
       - EUREKA_CLIENT_SERVICE_URL=http://${DISCOVERY_SERVICE_HOST}:${DISCOVERY_SERVICE_PORT}/eureka
       - BD_POSTGRESQL_URL=jdbc:postgresql://postgres:${MSVC_CLIENTE_BD_PORT}/${MSVC_CLIENTE_BD_NAME}
       - BD_POSTGRESQL_USERNAME=${POSTGRESQL_USER}
       - BD_POSTGRESQL_PASSWORD=${POSTGRESQL_PASSWORD}
     networks:
       - erp-vpc
-#
-#  msvc-compras:
-#    build:
-#      context: .
-#      dockerfile: ./msvc-compras/Dockerfile
-#    container_name: msvc-compras
-#    depends_on:
-#      discovery-server:
-#        condition: service_healthy
-#      config-server:
-#        condition: service_healthy
-#      mongodb:
-#        condition: service_started
-#    ports:
-#      - "${MSVC_COMPRAS_PORT}:7020"
-#    environment:
-#      - PORT_SERVICE_COMPRAS=${MSVC_COMPRAS_PORT}
-#      - CONFIG_SERVER_BRANCH=${CONFI_SERVER_BRANCH}
-#      - EUREKA-SERVICE-URL=http://${DISCOVERY_SERVICE_HOST}:${DISCOVERY_SERVICE_PORT}/eureka
-#      - BD_MONGODB_URI=mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_HOST}:${MONGODB_PORT}/${MONGODB_DB}?authSource=admin
-#      - CONFIG_SERVER_CONF_URI=http://${CONFI_SERVER_HOST}:${CONFI_SERVER_PORT}
-#      - CONFIG_SERVER_PROFILE=${CONFI_SERVER_PROFILE}
-#    networks:
-#      - erp-vpc
+
+  msvc-compras:
+    build:
+      context: .
+      dockerfile: ./msvc-compras/Dockerfile
+    container_name: msvc-compras
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+    ports:
+      - "${MSVC_COMPRAS_PORT}:7020"
+    environment:
+      - CONFIG_SERVER_CONF_URI=http://${CONFI_SERVER_HOST}:${CONFI_SERVER_PORT}
+      - CONFIG_SERVER_PROFILE=${CONFI_SERVER_PROFILE}
+      - EUREKA_CLIENT_SERVICE_URL=http://${DISCOVERY_SERVICE_HOST}:${DISCOVERY_SERVICE_PORT}/eureka
+      - BD_MONGODB_URI=mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_HOST}:${MONGODB_PORT}/${MONGODB_DB}?authSource=admin
+    networks:
+      - erp-vpc
 #
 #  cloud-gateway:
 #    build:
