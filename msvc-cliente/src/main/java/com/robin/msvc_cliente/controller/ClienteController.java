@@ -25,6 +25,21 @@ public class ClienteController {
         return ResponseEntity.ok(clienteService.getAllClientes());
     }
 
+    @GetMapping("/clientes")
+    public ResponseEntity<List<ClienteDto>> getAllClienteWithParameter(
+            @RequestParam("flag") boolean flag,
+            @RequestHeader("appCallerName") String appCallerName
+    ) throws Exception {
+        log.info("[ClienteController] - getAllClienteWithParameter");
+        System.out.println("[ClienteController] - getAllClienteWithParameter");
+        System.out.println("flag: " + flag);
+        System.out.println("appCallerName: " + appCallerName);
+        if (flag) {
+            throw new Exception("Flag is true.");
+        }
+        return ResponseEntity.ok(clienteService.getAllClientes());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ClienteDto> getClienteById(@PathVariable UUID id) {
         log.info("[ClienteController] - getClienteById: {}", id);

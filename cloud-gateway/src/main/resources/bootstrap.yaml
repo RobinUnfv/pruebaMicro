@@ -6,3 +6,10 @@ spring:
       uri: ${CONFIG_SERVER_CONF_URI}
       profile: ${CONFIG_SERVER_PROFILE}
       enabled: true
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICE_URL}

@@ -126,29 +126,30 @@ services:
       - BD_MONGODB_URI=mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_HOST}:${MONGODB_PORT}/${MONGODB_DB}?authSource=admin
     networks:
       - erp-vpc
-#
-#  cloud-gateway:
-#    build:
-#      context: .
-#      dockerfile: ./cloud-gateway/Dockerfile
-#    container_name: cloud-gateway
-#    depends_on:
-#      discovery-server:
-#        condition: service_healthy
-#      config-server:
-#        condition: service_healthy
-#      msvc-cliente:
-#        condition: service_started
-#      msvc-compras:
-#        condition: service_started
-#    ports:
-#      - "${CLOUD_GATEWAY_PORT}:4040"
-#    environment:
-#      - PORT_SERVICE_GATEWAY=${CLOUD_GATEWAY_PORT}
-#      - CONFIG_SERVER_CONF_URI=http://${CONFI_SERVER_HOST}:${CONFI_SERVER_PORT}
-#      - CONFIG_SERVER_PROFILE=${CONFI_SERVER_PROFILE}
-#    networks:
-#      - erp-vpc
+
+  cloud-gateway:
+    build:
+      context: .
+      dockerfile: ./cloud-gateway/Dockerfile
+    container_name: cloud-gateway
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      msvc-cliente:
+        condition: service_started
+      msvc-compras:
+        condition: service_started
+    ports:
+      - "${CLOUD_GATEWAY_PORT}:4040"
+    environment:
+      - PORT_SERVICE_GATEWAY=${CLOUD_GATEWAY_PORT}
+      - CONFIG_SERVER_CONF_URI=http://${CONFI_SERVER_HOST}:${CONFI_SERVER_PORT}
+      - CONFIG_SERVER_PROFILE=${CONFI_SERVER_PROFILE}
+      - EUREKA_CLIENT_SERVICE_URL=http://${DISCOVERY_SERVICE_HOST}:${DISCOVERY_SERVICE_PORT}/eureka
+    networks:
+      - erp-vpc
 
 networks:
   erp-vpc:
