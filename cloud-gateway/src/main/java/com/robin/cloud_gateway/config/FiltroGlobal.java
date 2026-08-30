@@ -9,7 +9,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @Slf4j
-@Component
+//@Component
 public class FiltroGlobal implements GlobalFilter {
 
     @Override

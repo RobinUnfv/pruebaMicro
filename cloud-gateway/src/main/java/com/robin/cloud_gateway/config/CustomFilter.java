@@ -7,7 +7,6 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 
 @Component
 public class CustomFilter extends AbstractGatewayFilterFactory<CustomFilter.CustomConfiguration> {
@@ -23,8 +22,8 @@ public class CustomFilter extends AbstractGatewayFilterFactory<CustomFilter.Cust
     @Override
     public GatewayFilter apply(CustomConfiguration config) {
         return ((exchange, chain) -> chain.filter(exchange).then(Mono.fromRunnable( () -> {
-              exchange.getResponse().getHeaders().add("appCallerName", "MitoCode-Cliente-Service");
-              exchange.getResponse().getCookies().add("responseCookie", ResponseCookie.from("responseCookie", "Mitocode-Cliente-Service").build());
+              exchange.getResponse().getHeaders().add(config.getHeaderKey(), config.getHeaderValue());
+              //exchange.getResponse().getCookies().add("responseCookie", ResponseCookie.from("responseCookie", "Mitocode-Cliente-Service").build());
         } )) );
     }
 

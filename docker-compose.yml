@@ -127,24 +127,20 @@ services:
     networks:
       - erp-vpc
 
-  cloud-gateway:
+  client-oauth2:
     build:
       context: .
-      dockerfile: ./cloud-gateway/Dockerfile
-    container_name: cloud-gateway
+      dockerfile: ./client-oauth2/Dockerfile
+    container_name: client-oauth2
     depends_on:
       discovery-server:
         condition: service_healthy
       config-server:
         condition: service_healthy
-      msvc-cliente:
-        condition: service_started
-      msvc-compras:
-        condition: service_started
     ports:
-      - "${CLOUD_GATEWAY_PORT}:4040"
+      - "${CLOUD_CLIENT_OAUTH2}:9099"
     environment:
-      - PORT_SERVICE_GATEWAY=${CLOUD_GATEWAY_PORT}
+      - PORT_CLIENT_OAUTH2=${CLOUD_CLIENT_OAUTH2}
       - CONFIG_SERVER_CONF_URI=http://${CONFI_SERVER_HOST}:${CONFI_SERVER_PORT}
       - CONFIG_SERVER_PROFILE=${CONFI_SERVER_PROFILE}
       - EUREKA_CLIENT_SERVICE_URL=http://${DISCOVERY_SERVICE_HOST}:${DISCOVERY_SERVICE_PORT}/eureka
