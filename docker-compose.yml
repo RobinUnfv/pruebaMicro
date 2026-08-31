@@ -144,6 +144,47 @@ services:
       - CONFIG_SERVER_CONF_URI=http://${CONFI_SERVER_HOST}:${CONFI_SERVER_PORT}
       - CONFIG_SERVER_PROFILE=${CONFI_SERVER_PROFILE}
       - EUREKA_CLIENT_SERVICE_URL=http://${DISCOVERY_SERVICE_HOST}:${DISCOVERY_SERVICE_PORT}/eureka
+      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+    networks:
+      - erp-vpc
+
+  mysql-keycloak:
+    image: mysql
+    container_name: ${KEY_KC_DB_URL_HOST}
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DB}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "${PORT_MYSQL}:3306"
+    networks:
+      - erp-vpc
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${MYSQL_USER}", "-p${MYSQL_PASSWORD}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  Keycloak:
+    image: quay.io/keycloak/keycloak:19.0.1
+    container_name: mitocode-keycloak
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_DB: ${KEY_KC_DB}
+      KC_DB_URL_HOST: ${KEY_KC_DB_URL_HOST}
+      KC_DB_URL_PORT: ${PORT_MYSQL}
+      KC_DB_USERNAME: ${MYSQL_USER}
+      KC_DB_PASSWORD: ${MYSQL_PASSWORD}
+      KC_DB_URL_DATABASE: ${MYSQL_DB}
+    ports:
+      - "${PORT_KEYCLOAK}:8080"
+    depends_on:
+      mysql-keycloak:
+        condition: service_healthy
+    command: ["start-dev"]
     networks:
       - erp-vpc
 

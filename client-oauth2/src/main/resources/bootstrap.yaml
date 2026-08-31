@@ -1,13 +1,22 @@
 spring:
   application:
     name: client-oauth2
+  cloud:
+    config:
+      uri: ${CONFIG_SERVER_CONF_URI}
+      profile: ${CONFIG_SERVER_PROFILE}
+      enabled: true
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id: ${GITHUB_CLIENT_ID}
+            client-secret: ${GITHUB_CLIENT_SECRET}
 
-logging:
-  level:
-    root: INFO
-    com.irojas.microservices: WARN
-  pattern:
-    console: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n'
-    file: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n'
-  file:
-    name: logs/client-oauth2.log
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICE_URL}
