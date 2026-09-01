@@ -15,17 +15,29 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
         </processorPath>
-        <module name="client-oauth2" />
         <module name="config-server" />
         <module name="msvc-cliente" />
         <module name="discovery-server" />
         <module name="cloud-gateway" />
         <module name="msvc-compras" />
       </profile>
+      <profile name="Annotation profile for client-keycloak" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
+        </processorPath>
+        <module name="client-keycloak" />
+      </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="client-oauth2" target="25" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="client-keycloak" options="-parameters" />
       <module name="client-oauth2" options="-parameters" />
       <module name="cloud-gateway" options="-parameters" />
       <module name="config-server" options="-parameters" />

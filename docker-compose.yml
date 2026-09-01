@@ -127,27 +127,27 @@ services:
     networks:
       - erp-vpc
 
-  client-oauth2:
-    build:
-      context: .
-      dockerfile: ./client-oauth2/Dockerfile
-    container_name: client-oauth2
-    depends_on:
-      discovery-server:
-        condition: service_healthy
-      config-server:
-        condition: service_healthy
-    ports:
-      - "${CLOUD_CLIENT_OAUTH2}:9099"
-    environment:
-      - PORT_CLIENT_OAUTH2=${CLOUD_CLIENT_OAUTH2}
-      - CONFIG_SERVER_CONF_URI=http://${CONFI_SERVER_HOST}:${CONFI_SERVER_PORT}
-      - CONFIG_SERVER_PROFILE=${CONFI_SERVER_PROFILE}
-      - EUREKA_CLIENT_SERVICE_URL=http://${DISCOVERY_SERVICE_HOST}:${DISCOVERY_SERVICE_PORT}/eureka
-      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
-      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
-    networks:
-      - erp-vpc
+#  client-oauth2:
+#    build:
+#      context: .
+#      dockerfile: ./client-oauth2/Dockerfile
+#    container_name: client-oauth2
+#    depends_on:
+#      discovery-server:
+#        condition: service_healthy
+#      config-server:
+#        condition: service_healthy
+#    ports:
+#      - "${CLOUD_CLIENT_OAUTH2}:9099"
+#    environment:
+#      - PORT_CLIENT_OAUTH2=${CLOUD_CLIENT_OAUTH2}
+#      - CONFIG_SERVER_CONF_URI=http://${CONFI_SERVER_HOST}:${CONFI_SERVER_PORT}
+#      - CONFIG_SERVER_PROFILE=${CONFI_SERVER_PROFILE}
+#      - EUREKA_CLIENT_SERVICE_URL=http://${DISCOVERY_SERVICE_HOST}:${DISCOVERY_SERVICE_PORT}/eureka
+#      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+#      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+#    networks:
+#      - erp-vpc
 
   mysql-keycloak:
     image: mysql
@@ -159,6 +159,8 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "${PORT_MYSQL}:3306"
+    volumes:
+      - mysql-keycloak-data:/var/lib/mysql
     networks:
       - erp-vpc
     healthcheck:
@@ -166,6 +168,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
   Keycloak:
     image: quay.io/keycloak/keycloak:19.0.1
@@ -179,15 +182,66 @@ services:
       KC_DB_USERNAME: ${MYSQL_USER}
       KC_DB_PASSWORD: ${MYSQL_PASSWORD}
       KC_DB_URL_DATABASE: ${MYSQL_DB}
+      KC_HOSTNAME_STRICT: "false"
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY: "edge"
+      JAVA_OPTS_KC_HEAP: "-Xmx512m -Xms256m"
+      KEYCLOAK_ISSUER_URI: ${KEYCLOAK_ISSUER_URI}
+      KEYCLOAK_TOKEN_URI: ${KEYCLOAK_TOKEN_URI}
+      KEYCLOAK_USER_INFO_URI: ${KEYCLOAK_USER_INFO_URI}
+      KEYCLOAK_JWK_SET_URI: ${KEYCLOAK_JWK_SET_URI}
+      KEYCLOAK_REDIRECT_URI: ${KEYCLOAK_REDIRECT_URI}
     ports:
       - "${PORT_KEYCLOAK}:8080"
     depends_on:
       mysql-keycloak:
         condition: service_healthy
-    command: ["start-dev"]
+    command:
+      - "start-dev"
+      - "--http-port=8080"
+      - "--hostname-strict=false"
+      - "--features=token-exchange"
+      - "--db=mysql"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://mitocode-keycloak:8080/realms/master" ]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 90s  # Keycloak tarda en iniciar completamente
+    restart: on-failure
+    networks:
+      - erp-vpc
+
+  client-keycloak:
+    build:
+      context: .
+      dockerfile: ./client-keycloak/Dockerfile
+    container_name: client-keycloak
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      Keycloak:
+        condition: service_healthy
+    ports:
+      - "${PORT_CLIENT_KEYAK}:9099"
+    environment:
+      - PORT_CLIENT_KEYAK=${PORT_CLIENT_KEYAK}
+      - CONFIG_SERVER_CONF_URI=http://${CONFI_SERVER_HOST}:${CONFI_SERVER_PORT}
+      - CONFIG_SERVER_PROFILE=${CONFI_SERVER_PROFILE}
+      - EUREKA_CLIENT_SERVICE_URL=http://${DISCOVERY_SERVICE_HOST}:${DISCOVERY_SERVICE_PORT}/eureka
+      - KEYCLOAK_ISSUER_URI=${KEYCLOAK_ISSUER_URI}
+      - KEYCLOAK_CLIENT_NAME=${KEYCLOAK_CLIENT_NAME}
+      - KEYCLOAK_CLIENT_ID=${KEYCLOAK_CLIENT_ID}
+      - KEYCLOAK_CLIENT_SECRET=${KEYCLOAK_CLIENT_SECRET}
     networks:
       - erp-vpc
 
 networks:
   erp-vpc:
     driver: bridge
+
+volumes:
+  mysql-keycloak-data:
+    driver: local

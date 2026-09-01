@@ -21,7 +21,8 @@
 	  <module>msvc-cliente</module>
 	  <module>msvc-compras</module>
 	  <module>cloud-gateway</module>
-	  <module>client-oauth2</module>
+<!--	  <module>client-oauth2</module>-->
+	  <module>client-keycloak</module>
   </modules>
 
 	<properties>

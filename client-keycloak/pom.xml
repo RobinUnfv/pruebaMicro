@@ -9,8 +9,8 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>com.robin</groupId>
-	<artifactId>client-oauth2</artifactId>
-	<name/>
+	<artifactId>client-keycloak</artifactId>
+	<name>client-keycloak</name>
 	<description/>
 
 	<dependencies>

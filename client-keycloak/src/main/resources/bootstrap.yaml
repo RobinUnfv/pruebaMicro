@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: client-keycloak
+  cloud:
+    config:
+      uri: ${CONFIG_SERVER_CONF_URI}
+      profile: ${CONFIG_SERVER_PROFILE}
+      enabled: true
+  security:
+    oauth2:
+      client:
+        provider:
+          mitocode-realm:
+            issuer-uri: ${KEYCLOAK_ISSUER_URI}
+            # Añadir configuración adicional
+            authorization-uri: ${KEYCLOAK_AUTHORIZATION_URI}
+            token-uri: ${KEYCLOAK_TOKEN_URI}
+            user-info-uri: ${KEYCLOAK_USER_INFO_URI}
+            jwk-set-uri: ${KEYCLOAK_JWK_SET_URI}
+        registration:
+          mitocode-realm:
+            provider: mitocode-realm
+            client-name: ${KEYCLOAK_CLIENT_NAME}
+            client-id: ${KEYCLOAK_CLIENT_ID}
+            client-secret: ${KEYCLOAK_CLIENT_SECRET}
+            scope:
+              - openid
+              - profile
+              - email
+            authorization-grant-type: authorization_code
+            redirect-uri: ${KEYCLOAK_REDIRECT_URI}
+            client-authentication-method: client_secret_post
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICE_URL}
